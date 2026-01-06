@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,8 +17,7 @@
     }
   },
   "include": [
-    "src/**/*",
-    "drizzle.config.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
