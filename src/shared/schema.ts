@@ -60,19 +60,23 @@ export const insertRegistrationSchema = createInsertSchema(registrations).pick({
   teamMembers: z.string().optional().nullable(), // Allow it to be optional/nullable explicitly if needed
 });
 
+// Export inferred types for User
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+
 export type InsertRegistration = z.infer<typeof insertRegistrationSchema>;
 export type Registration = typeof registrations.$inferSelect;
 
 // Enum helper for event configuration
 export const eventsConfig = {
-  "Code Red: Innixo Files": { type: "Team", fee: 90, teamSize: 3 },
-  "Paper Presentation": { type: "Team", fee: 0, teamSize: 2 }, // IEEE norms vary, using default team size 2 for now
-  "Prompt Forge": { type: "Individual", fee: 30, teamSize: 1 },
-  "Overdrive UI": { type: "Individual", fee: 50, teamSize: 1 },
-  "Debug Arena": { type: "Team", fee: 120, teamSize: 2 },
-  "Code Sprint": { type: "Team", fee: 120, teamSize: 2 },
-  "Fall Guys": { type: "Team", fee: 200, teamSize: 4 },
-  "Valorant": { type: "Team", fee: 500, teamSize: 5 },
-  "CS:GO": { type: "Team", fee: 500, teamSize: 5 },
-  "Overdrive Hack": { type: "Team", fee: 200, teamSize: 5 }
+  "Code Red: Innixo Files": { title: "Code Red: Innixo Files", type: "Team", fee: 90, teamSize: 3 },
+  "Paper Presentation": { title: "Paper Presentation", type: "Team", fee: 0, teamSize: 2 },
+  "Prompt Forge": { title: "Prompt Forge", type: "Individual", fee: 30, teamSize: 1 },
+  "Overdrive UI": { title: "Overdrive UI", type: "Individual", fee: 50, teamSize: 1 },
+  "Debug Arena": { title: "Debug Arena", type: "Team", fee: 120, teamSize: 2 },
+  "Code Sprint": { title: "Code Sprint", type: "Team", fee: 120, teamSize: 2 },
+  "Fall Guys": { title: "Fall Guys", type: "Team", fee: 200, teamSize: 4 },
+  "Valorant": { title: "Valorant", type: "Team", fee: 500, teamSize: 5 },
+  "CS:GO": { title: "CS:GO", type: "Team", fee: 500, teamSize: 5 },
+  "Overdrive Hack": { title: "Overdrive Hack", type: "Team", fee: 200, teamSize: 5 }
 };
