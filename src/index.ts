@@ -36,7 +36,7 @@ app.use(globalLimiter);
 app.use(
   express.json({
     limit: '100kb', // Limit body size to 100kb
-    verify: (req, _res, buf) => {
+    verify: (req: Request, _res: Response, buf: Buffer) => {
       req.rawBody = buf;
     },
   }),
@@ -55,7 +55,7 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;

@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import { type Request, type Response, type NextFunction, type Express } from "express";
 import { createServer, type Server } from "http";
 import crypto from "crypto";
 import { storage } from "./storage";
@@ -18,7 +18,7 @@ export async function registerRoutes(
   // prefix all routes with /api
 
   // Health check route for root
-  app.get("/", (_req, res) => {
+  app.get("/", (_req: Request, res: Response) => {
     res.json({ status: "ok", message: "Backend is running successfully!" });
   });
 
@@ -40,7 +40,7 @@ export async function registerRoutes(
   });
 
   // Apply rate limiting to registration endpoint
-  app.post("/api/register", strictLimiter, async (req, res) => {
+  app.post("/api/register", strictLimiter, async (req: Request, res: Response) => {
     try {
       const data = insertRegistrationSchema.parse(req.body);
       const registration = await storage.createRegistration(data);
@@ -77,7 +77,7 @@ export async function registerRoutes(
   };
 
   // Payment Order Creation Endpoint
-  app.post("/api/payments/create-order", strictLimiter, async (req, res) => {
+  app.post("/api/payments/create-order", strictLimiter, async (req: Request, res: Response) => {
     try {
       const { registrationId } = req.body;
       if (!registrationId) return res.status(400).json({ message: "Registration ID is required" });
@@ -153,7 +153,7 @@ export async function registerRoutes(
   });
 
   // Admin Middleware
-  const requireAdmin = (req: any, res: any, next: any) => {
+  const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
     const adminSecret = process.env.ADMIN_SECRET || "admin123"; // Fallback only for dev if env missing
     const authHeader = req.headers["x-admin-secret"];
 
@@ -165,7 +165,7 @@ export async function registerRoutes(
   };
 
   // Admin Registration Fetch
-  app.get("/api/admin/registrations", strictLimiter, requireAdmin, async (req, res) => {
+  app.get("/api/admin/registrations", strictLimiter, requireAdmin, async (req: Request, res: Response) => {
     try {
       const registrations = await storage.getAllRegistrations();
       res.json(registrations);
@@ -176,7 +176,7 @@ export async function registerRoutes(
   });
 
   // Admin CSV Export
-  app.get("/api/admin/export", strictLimiter, requireAdmin, async (req, res) => {
+  app.get("/api/admin/export", strictLimiter, requireAdmin, async (req: Request, res: Response) => {
     try {
       const registrations = await storage.getAllRegistrations();
 
@@ -215,7 +215,7 @@ export async function registerRoutes(
   });
 
   // Webhook Endpoint (Scaffold)
-  app.post("/api/razorpay/webhook", async (req, res) => {
+  app.post("/api/razorpay/webhook", async (req: Request, res: Response) => {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET || "test_secret";
     const signature = req.headers["x-razorpay-signature"] as string;
 
