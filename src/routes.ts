@@ -180,32 +180,50 @@ export async function registerRoutes(
     try {
       const registrations = await storage.getAllRegistrations();
 
-      const csvData = registrations.map(reg => ({
-        "Registration ID": reg.id,
-        "Full Name": reg.fullName,
-        "Email": reg.email,
-        "Mobile": reg.mobile,
-        "College": reg.college,
-        "Class": reg.class,
-        "Branch": reg.branch,
-        "Event": reg.eventName,
-        "Type": reg.eventType,
-        "Team Name": reg.teamName || "N/A",
-        "Team Leader": reg.teamLeader || "N/A",
-        "Team Members": reg.teamMembers || "[]",
-        "Status": reg.status,
-        "Payment Status": reg.paymentStatus,
-        "Amount Paid": reg.amountPaid || 0,
-        "Razorpay Order ID": reg.razorpayOrderId || "N/A",
-        "Created At": reg.createdAt
-      }));
+      const csvData = registrations.map(reg => {
+        let membersStr = "";
+        try {
+          if (reg.teamMembers) {
+            const members = JSON.parse(reg.teamMembers);
+            if (Array.isArray(members)) {
+              membersStr = members.map((m: any, idx: number) =>
+                `${idx + 1}. ${m.fullName} (${m.email} | ${m.mobile}) - ${m.college}`
+              ).join("; ");
+            }
+          }
+        } catch (e) {
+          membersStr = "Error parsing members";
+        }
+
+        return {
+          "Registration ID": reg.id,
+          "Full Name": reg.fullName,
+          "Email": reg.email,
+          "Mobile": reg.mobile,
+          "College": reg.college,
+          "Class": reg.class,
+          "Branch": reg.branch,
+          "Academic Year": reg.academicYear,
+          "Event": reg.eventName,
+          "Type": reg.eventType,
+          "Team Name": reg.teamName || "N/A",
+          "Team Leader": reg.teamLeader || "N/A",
+          "Team Members Details": membersStr || "N/A",
+          "Status": reg.status,
+          "Payment Status": reg.paymentStatus,
+          "Amount Paid": reg.amountPaid || 0,
+          "Razorpay Order ID": reg.razorpayOrderId || "N/A",
+          "Created At": new Date(reg.createdAt).toLocaleString(),
+          "Payment Date": reg.paymentCreatedAt ? new Date(reg.paymentCreatedAt).toLocaleString() : "N/A"
+        };
+      });
 
       const output = stringify(csvData, {
         header: true
       });
 
       res.setHeader("Content-Type", "text/csv");
-      res.setHeader("Content-Disposition", "attachment; filename=registrations.csv");
+      res.setHeader("Content-Disposition", "attachment; filename=registrations_full_export.csv");
       res.send(output);
 
     } catch (error) {
