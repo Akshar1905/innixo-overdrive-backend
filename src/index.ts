@@ -14,24 +14,42 @@ declare module "http" {
   }
 }
 
-// Enable CORS for Frontend
+// Enable CORS for Frontend with strict origin check
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "http://localhost:5173").split(",");
 app.use(cors({
-  origin: process.env.VITE_API_BASE_URL || "http://localhost:5173",
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
 // Helmet Security
 app.use(helmet());
 
-// Global Rate Limiting - Basic protection against DDoS
+// Global Rate Limiting - General DDoS protection
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 5000, // Very high limit to prevent blocking legitimate usage
+  limit: 1000, // Reduced from 5000 to 1000
   standardHeaders: 'draft-7',
   legacyHeaders: false,
-  message: { error: "Too many requests from this IP, please try again later." }
+  message: { error: "Too many requests, please try again later." }
 });
 app.use(globalLimiter);
+
+// Stricter limiter for Registration and Admin Login
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 20, // 20 attempts per hour
+  message: { error: "Too many attempts, please try again later." }
+});
+app.use("/api/register", authLimiter);
+app.use("/api/admin/login", authLimiter);
 
 app.use(
   express.json({
